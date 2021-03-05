@@ -36,14 +36,13 @@ mass_mat = [eye(3)* m,zeros(3);zeros(3),eye(3)*I];
 %Required terms for control algorithms - Mass-Inertia Tensor Matrix,Coriolis Matrix   
 %Gravitational Matrix, FWD kinematics and the Spatial Jacobian and its pseudoinverse 
 
-M = body_jacobian.' * mass_mat * body_jacobian; 
+M = body_jacobian.' * mass_mat * body_jacobian 
 C = mass2coriolis(M); %Hardcoded for 1-DOF
-N = m*g*gsl(2,4) + m_h*g*gst(2,4);
+N = m*g*gsl(2,4) + m_h*g*gst(2,4)
 
-spatial_jacobian = [zeta_s(1,4);zeta_s(2,4);zeta_s(3,4);wf1_s];
-psedo_spatial_jacobian = pinv(spatial_jacobian);
+spatial_jacobian = [zeta_s(1,4);zeta_s(2,4);zeta_s(3,4);wf1_s]
+psedo_spatial_jacobian = pinv(spatial_jacobian) 
 
-x_vec = gst(1:3,4); %Forward Kineamtics  
+x_vec = gst(1:3,4) %Forward Kineamtics  
 
-%Robot Manipulator Equation 
-tau = M*q_ddot + C*q_dot + N; 
+tau = M*q_ddot + C*q_dot + N
