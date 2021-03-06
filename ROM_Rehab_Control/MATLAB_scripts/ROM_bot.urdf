@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<robot name="ROM_bot">
+## define body(link) and its name, all properties of body will be  ## children of this link
+    <link name="base_link">
+    ## Inertial Properties of the solid body
+    ## Origin of body xyz Cartesian co-ordinates and rpy are roll, pitch ## and yaw
+    ## Mass of the body
+    ## 3x3 rotational inertial matrix values as the matrix is symmetric ## no need to write same values again
+    ## ixx ixy ixz
+    ## ixy iyy iyz
+    ## ixz iyz izz
+      <inertial>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <mass value="0.0"/>
+        <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+      </inertial>
+    ## Visual properties of solid body
+    ## Origin of body xyz Cartesian co-ordinates and rpy are roll, pitch ## and yaw
+    ## In geometry child put path to .obj file of your model
+    ## material name ="silver" is just a material name and color which ## is already defined in a separate file materials.xacro see GitHub
+      <visual>
+        <origin rpy="0 1.57 0" xyz="0 0 0"/>
+        <geometry>
+          <cylinder radius = "0.02" length = "0.1" />
+        </geometry>
+      </visual>
+    ## Collision properties of body
+    ## Origin of body xyz Cartesian co-ordinates and rpy are roll, pitch ## and yaw
+    ## In geometry child put path to .stl file of your model dont swap ## files in visual and collision properties otherwise we will get  ## error in solving for inverse kinematics.
+    </link>
+
+
+    <joint name="base_link__lever_arm" type="revolute">
+      <axis xyz="1 0 0"/>
+      <limit effort = "100.0" lower = "-3.14" upper = "0" velocity = "1"/>
+      <origin rpy="0 0 0" xyz="0.04 0.0 0.0"/>
+      <parent link="base_link"/>
+      <child link="lever_arm"/>   
+    </joint>
+
+    <link name="lever_arm">
+        <inertial>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <mass value="0.0"/>
+            <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+        </inertial>
+        <visual>
+        <origin rpy="1.57 0 0" xyz="0.03 0.18 0"/>
+        <geometry>
+          <cylinder radius = "0.02" length = "0.4" />
+        </geometry>
+      </visual>
+    </link>
+    
+    <joint name="lever_arm__handle" type="fixed">
+      <origin rpy="0 0 0" xyz="0.03 0.4 0"/>
+      <parent link="lever_arm"/>
+      <child link="handle"/>   
+    </joint>
+
+    <link name="handle">
+      <inertial>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <mass value="0.0"/>
+        <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
+      </inertial>
+      <visual>
+        <origin rpy="0 1.57 0" xyz="0.08 0.0 0"/>
+        <geometry>
+          <cylinder radius = "0.02" length = "0.2" />
+        </geometry>
+      </visual>
+    </link>
+
+</robot> 
+
