@@ -11,7 +11,7 @@
     ## ixz iyz izz
       <inertial>
         <origin rpy="0 0 0" xyz="0 0 0"/>
-        <mass value="0.0"/>
+        <mass value="0.5"/>
         <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
       </inertial>
     ## Visual properties of solid body
@@ -41,7 +41,7 @@
     <link name="lever_arm">
         <inertial>
             <origin rpy="0 0 0" xyz="0 0 0"/>
-            <mass value="0.0"/>
+            <mass value="0.5"/>
             <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
         </inertial>
         <visual>
@@ -61,7 +61,7 @@
     <link name="handle">
       <inertial>
         <origin rpy="0 0 0" xyz="0 0 0"/>
-        <mass value="0.0"/>
+        <mass value="0.1"/>
         <inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0"/>
       </inertial>
       <visual>
