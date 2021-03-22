@@ -2,8 +2,8 @@ function c = mass2coriolis(M)
 syms q1 q2 q_dot_1 q_dot_2
 
 c = sym(zeros(size(M))); 
-q = [q1]; 
-q_dot = [q_dot_1];
+q = [q1;q2]; 
+q_dot = [q_dot_1,q_dot_2];
 for i = 1:size(M,1)
     for j = 1:size(M,2)
         for k = 1:size(q,1)

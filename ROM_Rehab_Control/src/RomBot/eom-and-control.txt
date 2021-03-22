@@ -1,0 +1,25 @@
+RP Arm:
+ 
+DOF ==> 	q = [theta;d]
+State-Space ==> state = [q;q_dot]
+X-vector ==> 6x1 vector of x,y,z,r,p,y 
+ 
+Equations of Motion: 
+tau_r = theta_ddot*(2*I + (l^2*m_l)/4 + m_p*(d/2 + l)^2) + g*m_h*sin(theta)*(d + l) + (g*l*m_l*sin(theta))/2 + (g*m_p*sin(theta)*(d + 2*l))/2
+tau_p = (d_dot*m_p)/4 + g*m_h*sin(theta)*(d + l) + (g*l*m_l*sin(theta))/2 + (g*m_p*sin(theta)*(d + 2*l))/2
+
+Notes: 
+COM is taken at the geometric center of the revolue and prismatic linkage 
+Still assuming I is equivalent for both linkages (easy to change) 
+
+
+
+
+Position-Based Impedence Control Law: 
+tau_r_c = (yawddot_ee_d - (tau_z + B_i*(yawdot_ee - yawdot_ee_d) + K_i*(yaw_ee - yaw_ee_d))/M_i)*(2*I + (l^2*m_l)/4 + m_p*(d/2 + l)^2) - tau_z + g*m_h*sin(theta)*(d + l) + (g*l*m_l*sin(theta))/2 + (g*m_p*sin(theta)*(d + 2*l))/2
+tau_p_c = (m_p*sin(theta)*(yddot_ee_d - (f_y + B_i*(ydot_ee - ydot_ee_d) + K_i*(y_ee - y_ee_d))/M_i))/4 - f_y*sin(theta) - f_x*cos(theta) + (m_p*cos(theta)*(xddot_ee_d - (f_x + B_i*(xdot_ee - xdot_ee_d) + K_i*(x_ee - x_ee_d))/M_i))/4 + g*m_h*sin(theta)*(d + l) + (g*l*m_l*sin(theta))/2 + (g*m_p*sin(theta)*(d + 2*l))/2
+
+Notes: 
+Tuneable parameters are M_i,B_i,K_i
+Any place that says yaw ==> theta since orientation of the EE should be the same as the orientation at revolute joint 
+Cannot sense force in both x/y direction so remove f_x and make distinction that only f_y will be considered 
