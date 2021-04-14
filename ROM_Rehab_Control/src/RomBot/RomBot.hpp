@@ -1,6 +1,6 @@
 #ifndef ROM_BOT_H
 #define ROM_BOT_H
-#include <Arduino.h> 
+//#include <Arduino.h> 
 #include <math.h>
 //! A class for the parameters of a RP rehabilitation robot
 /*!
@@ -15,23 +15,46 @@ class RomBot {
         /**
         * @brief Constructor for RomBot Class
         * @param[in] revoluteLength Length of revolute link
-        * @param[in] handleLength Length of handle for hand placement
         * @param[in] mass Array of doubles that contain masses for the two links and handle (size = numBodies_) 
         * @param[in] inertia Array of doubles that contain the inertial terms for the two links and handle (size = numBodies_) 
         */
-        RomBot(double revoluteLength,double handleLength, double mass[], double inertia[]); 
+        RomBot(double revoluteLength, double mass[], double inertia[]); 
         
+
+
+        /**
+        * @brief Function to update parameter values from sensor mesurements
+        * @param[in] thetaSensed Position of revolute joint read from encoder
+        * @param[in] dSensed Postion of prismatic joint read from encoder 
+        * @param[in] extFSensed Force at the EE read from a force sensor  
+        * @param[in] pwm1 PWM signal for revolute joint to covert to qdot_[0]
+        * @param[in] pwm2 PWM signal for prismatic joint to covert to qdot_[1]
+        */
+        void updateRomBot(double thetaSensed, double dSensed, double extFSensed,double pwm1, double pwm2); 
+
+        /**
+        * @brief A public Forward kinematics function 
+        * @param[in] q 2D array containing values for theta and r
+        * @return A dynamically allocated array that contains the position mapping from joint space to task space 
+        */
+        double *fK(double q[]);
+
+        
+        /**
+        * @brief A public Differential kinematics function 
+        * @param[in] q 2D array containing values for theta and r
+        * @param[in] qdot 2D array containing values for thetaDot and rDot
+        * @return A dynamically allocated array that contains the velocity mapping from joint space to task space for velocity
+        */
+        double *dK(double q[], double qdot[]);  
+
+
         /**
         * @brief Getter for length of revolute linkage  
         * @return Length as const double 
         */
         const double getRevoluteLength(); 
 
-        /**
-        * @brief Getter for length of handle  
-        * @return Length as const double 
-        */
-        const double getHandleLength();
 
         /**
         * @brief Getter for mass array of size numBodies_ 
@@ -57,6 +80,13 @@ class RomBot {
         */
         double getD(); 
 
+        
+        /**
+        * @brief Getter for externalForce position 
+        * @return Current externalForce_ read from force sensor 
+        */
+        double getExternalForce(); 
+
         /**
         * @brief Getter for theta velocity of 
         * @return thetaDot taken directly from qdot_[0]
@@ -81,18 +111,9 @@ class RomBot {
         */
         double *getVelEE(); 
 
-        /**
-        * @brief Function to update parameter values from sensor mesurements
-        * @param[in] thetaSensed Position of revolute joint read from encoder
-        * @param[in] dSensed Postion of prismatic joint read from encoder 
-        * @param[in] extFSensed Force at the EE read from a force sensor  
-        * @param[in] pwm1 PWM signal for revolute joint to covert to qdot_[0]
-        * @param[in] pwm2 PWM signal for prismatic joint to covert to qdot_[1]
-        */
-        void updateRomBot(double thetaSensed, double dSensed, double extFSensed,double pwm1, double pwm2); 
+
 
     private:
-
 
         /**
         * @brief Forward kinematics that takes the updated q and maps to x
@@ -103,6 +124,7 @@ class RomBot {
         * @brief Differential Kinematics that take the updated qdot and maps to xdot
         */
         void differentialKinematics(); 
+
 
         /// Number of Rigid bodies in Dynamic System 
         static const int numBodies_ = 3; 
@@ -135,7 +157,7 @@ class RomBot {
         double xdot_[3]; 
 
         /// External Force at the EE
-        double externalForce_; 
+        double externalForce_ = 0; 
         
 };
-#endif // RomBot 
+#endif // ROM_BOT_H 

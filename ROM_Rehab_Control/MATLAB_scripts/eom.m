@@ -11,8 +11,8 @@ syms m_l m_h m_p g I l  h tau d d_dot d_ddot theta theta_dot theta_ddot tau_cont
      M_i B_i K_i real %Impedence gains 
 
 q = [theta;d]; 
-q_dot = [theta_dot;d_dot]; 
-q_ddot = [theta_ddot;d_dot];
+q_dot = [theta_dot;d_dot];
+q_ddot = [theta_ddot;d_ddot];
 states = [q;q_dot]; 
 
 x = [x_ee y_ee z_ee roll_ee pitch_ee yaw_ee]'; 

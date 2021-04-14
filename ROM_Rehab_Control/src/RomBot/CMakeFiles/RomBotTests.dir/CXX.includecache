@@ -1,0 +1,10 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/c/Users/ajosh/Desktop/TextBooks^CMU/ROBOTICS/Act/EMSD(24-671)/ROM_Rehab_Control/ROM_Rehab_Control/src/RomBot/test/RomBotTests.cpp
+
