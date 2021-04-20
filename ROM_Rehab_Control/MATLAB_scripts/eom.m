@@ -1,6 +1,6 @@
 %%
 %Setup symbolic variables and state space 
-syms m_l m_h m_p g I l  h tau d d_dot d_ddot theta theta_dot theta_ddot tau_control ... % For Dynamics 
+syms m_l m_h m_p g I_l I_p l  h tau d d_dot d_ddot theta theta_dot theta_ddot tau_control ... % For Dynamics 
      x_ee y_ee z_ee roll_ee pitch_ee yaw_ee... % Postion of EE
      x_ee_d y_ee_d z_ee_d roll_ee_d pitch_ee_d yaw_ee_d... % Desired positon of EE     
      xdot_ee ydot_ee zdot_ee rolldot_ee pitchdot_ee yawdot_ee... % Velocity of EE
@@ -14,7 +14,6 @@ q = [theta;d];
 q_dot = [theta_dot;d_dot];
 q_ddot = [theta_ddot;d_ddot];
 states = [q;q_dot]; 
-
 x = [x_ee y_ee z_ee roll_ee pitch_ee yaw_ee]'; 
 x_desired = [x_ee_d y_ee_d z_ee_d roll_ee_d pitch_ee_d yaw_ee_d]'; 
 
@@ -24,7 +23,8 @@ xdot_desired = [xdot_ee_d ydot_ee_d zdot_ee_d rolldot_ee_d pitchdot_ee_d yawdot_
 xddot_desired = [xddot_ee_d yddot_ee_d zddot_ee_d rollddot_ee_d pitchddot_ee_d yawddot_ee_d]'; 
 
 f_ext = [f_x f_y f_z tau_x tau_y tau_z]'; 
-
+A_lin = jacobian(f,states);
+B_lin = jacobian(f,inputs);
 %Define Impedence Terms 
 M_d = eye(6)*M_i;
 B_d = eye(6)* B_i; 
@@ -90,9 +90,9 @@ body_jacobian2 = [bj1_p bj2_p];
 
 
 
-mass_mat_r = [eye(3)* m_l,zeros(3);zeros(3),eye(3)*I];
+mass_mat_r = [eye(3)* m_l,zeros(3);zeros(3),eye(3)*I_l];
 
-mass_mat_p = [eye(3)* m_p,zeros(3);zeros(3),eye(3)*I];
+mass_mat_p = [eye(3)* m_p,zeros(3);zeros(3),eye(3)*I_p];
 
 %%%
 

@@ -16,17 +16,6 @@ void RomBot::forwardKinematics() {
     x_[2] = q_[0]; // theta-component
 }
 
-double *RomBot::fK(double q[]) { 
-
-    double *x = new double[3]; 
-
-    x[0] = cos(q[0]) * (q[1] + revoluteLength_); // x-component
-    x[1] = sin(q[0]) * (q[1] + revoluteLength_); // y-component
-    x[2] = q[0]; // theta-component
-
-    return x; 
-}
-
 void RomBot::differentialKinematics() { 
     xdot_[0] = qdot_[1] * cos(q_[0]); // xdot-component
     xdot_[1] = qdot_[1] * sin(q_[0]); // ydot-component
@@ -34,26 +23,26 @@ void RomBot::differentialKinematics() {
 
 }
 
-double *RomBot::dK(double q[], double qdot[]) { 
+
+
+//Complete this function  
+void RomBot::forwardDyanmics(double tau[2]) { 
+    qddot_[0] = 0; 
+    qddot_[1] = 0; 
     
-    double *xdot = new double[3]; 
-
-    xdot[0] = qdot[1] * cos(q[0]); // xdot-component
-    xdot[1] = qdot[1] * sin(q[0]); // ydot-component
-    xdot[2] = qdot[0]; // thetadot-component
-
-    return xdot; 
+    xddot_[0] = qddot_[1] * cos(q_[0]) - qddot_[0]*qddot_[1] * sin(q_[0]); 
+    xddot_[1] = qddot_[1] * sin(q_[0]) + qddot_[0]*qddot_[1] * cos(q_[0]); 
 }
 
-void RomBot::updateRomBot(double thetaSensed, double dSensed, double extFSensed, double pwm1, double pwm2) { 
+void RomBot::updateRomBot(double thetaSensed, double rSensed,double thetadotSensed, double rdotSensed, double extFSensed) { 
     
     // Update current angle, prismatic length, 
     q_[0] = thetaSensed; 
-    q_[1] = dSensed;
+    q_[1] = rSensed;
 
     // Update change in angle,  prismatic length over time 
-    qdot_[0] = pwm1; 
-    qdot_[1] = pwm2; 
+    qdot_[0] = thetadotSensed; 
+    qdot_[1] = rdotSensed; 
 
     // Update extForce at the EE
     externalForce_ = extFSensed;  
@@ -83,7 +72,7 @@ double RomBot::getTheta() {
     return q_[0]; 
 }
 
-double RomBot::getD() { 
+double RomBot::getR() { 
     return q_[1]; 
 }
 
@@ -95,7 +84,7 @@ double RomBot::getThetaDot() {
     return qdot_[0]; 
 }
 
-double RomBot::getDDot() { 
+double RomBot::getRDot() { 
     return qdot_[1]; 
 }
 
@@ -107,4 +96,8 @@ double *RomBot::getPosEE() {
 double *RomBot::getVelEE() { 
     return xdot_; 
 }
+
+double *RomBot::getAccEE() { 
+    return xddot_; 
+} 
 
