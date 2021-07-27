@@ -1,41 +1,70 @@
-#include<iostream>
+//#include<iostream>
 #include "RomBot.hpp"
 #include "CpmController.hpp" 
+#include "CpmPositionControl.hpp"
+//#include <fstream>
+//#include <iostream> 
 int main() { 
 
     // Test Waypoint 
-    double wayPoints[3][6] = {{0,0.18,0,0,0,0},{-0.004, 0.1798, -0.5343*(pow(10,-4)), -0.2337*(pow(10,-4)), -0.0106, -0.0046}, {-0.0026, 0.1788, -0.2104*(pow(10,-3)), -0.0921*(pow(10,-3)), -0.0207, -0.0091}}; 
-    double wayPoint[6] = {0,0.18,0,0,0,0};
+    double wayPoint[2] = {15,2};
 
-
-    // RomBot stuff  
+    double ts = 0.007; 
+    // RomBot - Init length for revolute arm, masses for bodies, and inertia 
     double rl = 0.2;
     double mass[3] = {1.0, 1.0, 0.5};
     double inertia[2] =  {1.5, 1.3}; 
 
-    // Controller stuff
-    double M_i = 0.5; 
-    double B_i = 3; 
-    double K_i = 2; 
-    char type[20] = "Simple";
+    // Controller - Init desired impedence paramters (might change this to array), and type of controller
+    double M_i[2] = {1.0,1.0}; 
+    double B_i[2] = {2.5,2.5}; 
+    double K_i[2] = {25,25}; 
+    
 
     // Create robot and controller obj
     RomBot robot(rl,mass,inertia); 
-    CpmController cpm(M_i,B_i,K_i,type); 
+    CpmPositionControl cpm(M_i,B_i,K_i,ts); 
 
+    double theta_pos[1000]; 
+    double r_pos[1000]; 
     // Local variables to store current sensor measurements 
-    double thetaSensed = -0.001; 
-    double rSensed = 0.18003; 
-    double thetadotSensed = 0; 
-    double rdotSensed = 0; 
-    double F_ext = 0; 
+    double thetaSensed = 3; 
+    double rSensed = 0.2; 
+    double F_ext = 1000; 
+    /*
+    std::ofstream myfile;
+    myfile.open("example.txt");
+    myfile << "[theta , r]\n";
+    for(int i = 0;  i <  1000; i++) { 
+        /*
+        if(i == 200){ 
+            F_ext = 60; 
+        }
+        robot.updateRomBot(thetaSensed,rSensed,F_ext); 
+        cpm.updateImpedencePosition(robot, wayPoint); 
+        
+        theta_pos[i] = cpm.getThetaPos(); 
+        r_pos[i] = cpm.getRPos();
 
-    robot.updateRomBot(thetaSensed,rSensed,thetadotSensed,rdotSensed,F_ext); 
-    cpm.updateTorques(robot, wayPoint); 
+ 
+        myfile << cpm.getThetaPos() << " " << cpm.getRPos() << "\n";
+        F_ext = 0; 
+    }
+    myfile.close();
+    // Update robot obj and controller obj from sensor values and waypoint 
+
     
     std::cout << "q: " << robot.getTheta() << "," << robot.getR() << "\n"; 
     std::cout << "qdot: " << robot.getTheta() << "," << robot.getRDot() << "\n"; 
-    std::cout << "tau: " << cpm.getThetaTorque() << "," << cpm.getRTorque() << "\n"; 
+    std::cout << "tau: " << cpm.getThetaPos() << "," << cpm.getRPos() << "\n"; 
+
+    for (auto pos : theta_pos)  {
+        std::cout << "theta: " << pos << "\n"; 
+    }
+    for (auto pos : r_pos)  {
+        std::cout << "r: " << pos << "\n"; 
+    }
 
     std::cin.get(); 
+    */
 }

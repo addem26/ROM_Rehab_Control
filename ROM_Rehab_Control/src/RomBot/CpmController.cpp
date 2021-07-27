@@ -5,6 +5,16 @@ CpmController::CpmController(double M_i, double B_i, double K_i,char *controller
     this->B_i = B_i; 
     this->K_i = K_i; 
     controller_ = controller; 
+    /*
+    if (strcmp(controller_,"ModelBased") == 0) { 
+        std::cout << "Using Model Based Impedence Control:\n"; 
+    }
+    else if(strcmp(controller_, "PositionBased") == 0) {
+        std::cout << "Using Position Based Impedence Control:\n"; 
+    }
+    else
+        std::cout << "Using Joint Space Impedence Control:\n"; 
+    */
 }
 
 
@@ -23,11 +33,8 @@ void CpmController::differentialKinematics() {
 }
 
 void CpmController::updateTorques(RomBot& robot, double mjtWaypoint[]) { 
-    // Init Desired states from mjtWaypoint 
-    double qDesired[2]; 
-    double qdotDesired[2];  
-    double qddotDesired[2]; 
 
+    // Unpack waypoint and store in private attribute to use later 
     for (int i = 0;  i < 6; ++i) { 
         mjtWaypoint_[i] = mjtWaypoint[i]; 
     }
@@ -50,25 +57,27 @@ void CpmController::updateTorques(RomBot& robot, double mjtWaypoint[]) {
         errorddotEE_[i] = xddot[i] - xddotDesired_[i]; 
     }
 
-    computeTorques(robot,qDesired,qdotDesired,qddotDesired); 
+    computeTorques(robot); 
 
 }
 
-void CpmController::computeTorques(RomBot& robot, double qDesired[],double qdotDesired[], double qddotDesired[]) { 
-
-    if (strcmp(controller_,"ModelBasedImp") == 0) { 
-        modelBasedImpedence(robot,qDesired,qdotDesired,qddotDesired); 
+void CpmController::computeTorques(RomBot& robot) { 
+    /*
+    if (strcmp(controller_,"ModelBased") == 0) { 
+        modelBasedImpedence(robot); 
     }
-    else if(strcmp(controller_, "PositionBasedImp") == 0) {
-        positionBasedImpedence(robot,qDesired,qdotDesired,qddotDesired); 
+    else if(strcmp(controller_, "PositionBased") == 0) {
+        positionBasedImpedence(robot); 
     }
     else
-        simpleImpedence(robot,qDesired,qdotDesired); 
+        jointSpaceImpedence(robot); 
+        */
 }
 
 
-void CpmController::simpleImpedence(RomBot& robot, double qDesired[],double qdotDesired[]) { 
+void CpmController::jointSpaceImpedence(RomBot& robot) { 
     
+    // Store sensor measurements and desired states locally 
     double theta = robot.getTheta(); 
     double thetadot = robot.getThetaDot(); 
     double thetaDesired = mjtWaypoint_[0]; 
@@ -79,19 +88,32 @@ void CpmController::simpleImpedence(RomBot& robot, double qDesired[],double qdot
     double rDesired = mjtWaypoint_[1]; 
     double rdotDesired = mjtWaypoint_[3]; 
 
-    tau_[0] = K_i * (thetaDesired - theta) + B_i * (thetadotDesired  - thetadot);   
-    tau_[1] = K_i * (rDesired - r) + B_i * (rdotDesired  - rdot);   
+    // Compute torque at revolute and prismatic joints
+    tau_[0] = K_i * (thetaDesired - theta) + B_i * (thetadotDesired  - thetadot); //compute tau_theta   
+    tau_[1] = K_i * (rDesired - r) + B_i * (rdotDesired  - rdot); //compute tau_r   
 
 }
 
-void CpmController::positionBasedImpedence(RomBot& robot, double qDesired[],double qdotDesired[], double qddotDesired[]) { 
-    //Update observed acceleration from torque commands 
-    robot.forwardDyanmics(tau_); 
+void CpmController::positionBasedImpedence(RomBot& robot) { 
+    
+    //Update observed acceleration from torque commands and store theta locally 
+    //robot.forwardDyanmics(tau_); 
 
+    double theta = robot.getTheta(); 
+
+    // Compute impedence contact force at the EE  
+    double f_x = B_i * (-errordotEE_[0]) + K_i * (-errorEE_[0]); //We can add acc once fwddynamics done 
+    double f_y = B_i * (-errordotEE_[1]) + K_i * (-errorEE_[1]);
+    double tau_z = B_i * (-errordotEE_[2]) + K_i * (-errorEE_[2]);
+    
+    tau_[0] = tau_z; //compute tau_theta 
+    tau_[1] = f_x * cos(theta) + f_y * sin(theta); //compute tau_r 
 }
+
 // In Progress
-void CpmController::modelBasedImpedence(RomBot& robot, double qDesired[],double qdotDesired[], double qddotDesired[]) { 
-        // Get physical parameters from robot 
+void CpmController::modelBasedImpedence(RomBot& robot) { 
+    
+    // Get physical parameters from robot 
     const double l = robot.getRevoluteLength(); 
     const double *mass = robot.getMass(); 
     const double *i  = robot.getInertia(); 
@@ -103,8 +125,8 @@ void CpmController::modelBasedImpedence(RomBot& robot, double qDesired[],double 
     double thetadot = robot.getThetaDot(); 
     double rdot = robot.getRDot();  
 
-    double thetaddotDesired = qddotDesired[0]; 
-    double rddotDesired = qddotDesired[1]; 
+    double thetaddotDesired = mjtWaypoint_[4]; 
+    double rddotDesired = mjtWaypoint_[5]; 
 
     //Get force and store in local variable and compute torque about the z-axis 
     double force = robot.getExternalForce(); 
@@ -150,7 +172,6 @@ double CpmController::getRTorque() {
 double *CpmController::getPosError() { 
     return errorEE_; 
 }
-
 
 double *CpmController::getVelError() { 
     return errordotEE_; 

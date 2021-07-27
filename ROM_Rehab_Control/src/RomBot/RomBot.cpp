@@ -23,10 +23,8 @@ void RomBot::differentialKinematics() {
 
 }
 
-
-
 //Complete this function  
-void RomBot::forwardDyanmics(double tau[2]) { 
+void RomBot::forwardDyanmics(double tau[]) { 
     qddot_[0] = 0; 
     qddot_[1] = 0; 
     
@@ -43,6 +41,24 @@ void RomBot::updateRomBot(double thetaSensed, double rSensed,double thetadotSens
     // Update change in angle,  prismatic length over time 
     qdot_[0] = thetadotSensed; 
     qdot_[1] = rdotSensed; 
+
+    // Update extForce at the EE
+    externalForce_ = extFSensed;  
+
+    // Update x
+    forwardKinematics(); 
+
+    // Update xdot
+    differentialKinematics(); 
+
+    
+}
+
+void RomBot::updateRomBot(double thetaSensed, double rSensed, double extFSensed) { 
+    
+    // Update current angle, prismatic length, 
+    q_[0] = thetaSensed; 
+    q_[1] = rSensed;
 
     // Update extForce at the EE
     externalForce_ = extFSensed;  

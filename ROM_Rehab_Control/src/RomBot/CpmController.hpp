@@ -2,9 +2,10 @@
 #define CPM_CONTROLLER_H 
 //#include <Arduino.h> 
 #include <math.h> 
-#include <cstring> 
+//#include <cstring> 
+//#include <iostream> 
 #include "RomBot.hpp" 
-//! A class for Position-based impedence controller for a RP rehabilitation robot
+//! A class for Torque-based impedence controller for a RP rehabilitation robot
 /*!
    This class contains all the necessary computations needed to find the desired torque at the two motors given impedence parameters. There are a number of functions that can 
    interact with the RomBot objects to get current torque values and to update the torque values as the RomBot object evloves over time (i.e. sensor values change).  
@@ -18,6 +19,7 @@ class CpmController {
         * @param[in] M_i Inertial impedence parameter 
         * @param[in] B_i Dampening impedence parameter 
         * @param[in] K_i Spring impedence parameter 
+        * @param[in] controller Specify type of controller: Joint, Position, Model  
         */
         CpmController(double M_i,double B_i,double K_i,char *controller);
 
@@ -85,43 +87,32 @@ class CpmController {
 
         /**
         * @brief Function to compute torque values based off of an impedence control scheme that the user decides. Called inside of updateTorques.   
-        * @param[in] robot RomBot object instance that contains robot parameter information 
-        * @param[in] qDesired Array of doubles for desired joint pos unpacked from mjtWaypoint 
-        * @param[in] qdotDesired Array of doubles for desired joint vel unpacked from mjtWaypoint
-        * @param[in] qddotDesired Array of doubles for desired joint acc unpacked from mjtWaypoint   
+        * @param[in] robot RomBot object instance that contains robot parameter information  
         */
-        void computeTorques(RomBot& robot, double qDesired[],double qdotDesired[], double qddotDesired[]); 
+        void computeTorques(RomBot& robot); 
 
 
         /**
         * @brief Function to calculate torque based off of impedence regulation at each joint (i.e. position and velocity error scaled by K_i and B_i for each joint)   
         * @param[in] robot RomBot object to get kinematic values read from sensors
-        * @param[in] qDesired Array of doubles for desired joint pos unpacked from mjtWaypoint 
-        * @param[in] qdotDesired Array of doubles for desired joint vel unpacked from mjtWaypoint
         */
-        void simpleImpedence(RomBot& robot, double qDesired[],double qdotDesired[]); 
+        void jointSpaceImpedence(RomBot& robot); 
 
 
         /**
         * @brief Function to compute torque values based off of a position-based impedence control law that computes a cmd contact force as impedence at the EE (based off of kinematic error terms)
         *  and corrects for it throught the transpose of the jacobian 
-        * @param[in] robot RomBot object instance that contains robot parameter information 
-        * @param[in] qDesired Array of doubles for desired joint pos unpacked from mjtWaypoint 
-        * @param[in] qdotDesired Array of doubles for desired joint vel unpacked from mjtWaypoint
-        * @param[in] qddotDesired Array of doubles for desired joint acc unpacked from mjtWaypoint   
+        * @param[in] robot RomBot object instance that contains robot parameter information  
         */
-        void positionBasedImpedence(RomBot& robot, double qDesired[],double qdotDesired[], double qddotDesired[]); 
+        void positionBasedImpedence(RomBot& robot); 
 
         
         /**
         * @brief Function to compute torque values based off of a model-based impedence control law that computes desired joint torques with feedforward/feedback terms. This method requires in depth knowledge about 
         * the plant and assumes that we will be computing M(q) and N(q) online  
-        * @param[in] robot RomBot object instance that contains robot parameter information 
-        * @param[in] qDesired Array of doubles for desired joint pos unpacked from mjtWaypoint 
-        * @param[in] qdotDesired Array of doubles for desired joint vel unpacked from mjtWaypoint
-        * @param[in] qddotDesired Array of doubles for desired joint acc unpacked from mjtWaypoint   
+        * @param[in] robot RomBot object instance that contains robot parameter information    
         */
-        void modelBasedImpedence(RomBot& robot, double qDesired[],double qdotDesired[], double qddotDesired[]); 
+        void modelBasedImpedence(RomBot& robot); 
 
 
         /// Gravity Constant  
